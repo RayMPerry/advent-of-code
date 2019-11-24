@@ -9,32 +9,42 @@ import std.functional;
 import std.range;
 import std.format;
 
-// Initial iteration:
-// currentFrequencies = [0], accumulator = 0, currentItem = (some int)
-int logAllFrequencies(ref int[] currentFrequencies, int accumulator, int currentItem) {
-  int newFrequency = accumulator + currentItem;
-  // TODO: Why isn't this logging the first duplicate?
-  if (currentFrequencies.canFind(newFrequency)) {
-    "The first duplicate frequency is %s.".format(newFrequency).writeln;
+int findDuplicateFrequency(int[] inputs = [0]) {
+  int currentFrequency = 0;
+  int[] currentFrequencies = [0];
+
+  auto sequence = inputs.cycle;
+  while (!sequence.empty) {
+    currentFrequency += sequence.front;
+    sequence.popFront();
+    if (currentFrequencies.canFind(currentFrequency)) {
+      "The first duplicate frequency is %s.".format(currentFrequency).writeln;
+      break;
+    }
+    currentFrequencies ~= currentFrequency;
   }
 
-  currentFrequencies ~= newFrequency;
-  return newFrequency;
+  return currentFrequency;
 }
 
 void main() {
-  int[] currentFrequencies = [0];
-  alias logDuplicateFrequencies = partial!(logAllFrequencies, currentFrequencies);
-
   string fileName = "input.txt";
   enforce(fileName.exists, "The file 'input.txt' doesn't exist.");
-  File(fileName, "r")
-      .byLine
-      .map!(to!int)
-      .fold!(logDuplicateFrequencies)
-      .writeln;
 
-  currentFrequencies.length.writeln;
+  int[] fileInputs = [];
+  foreach (line; File(fileName, "r").byLine) {
+    fileInputs ~= to!int(line);
+  }
+
+  findDuplicateFrequency(fileInputs);
+}
+
+unittest {
+  assert(findDuplicateFrequency() == 0);
+  assert(findDuplicateFrequency([+1, -1]) == 0);
+  assert(findDuplicateFrequency([+3, +3, +4, -2, -4]) == 10);
+  assert(findDuplicateFrequency([-6, +3, +8, +5, -6]) == 5);
+  assert(findDuplicateFrequency([+7, +7, -2, -7, -4]) == 14);
 }
 
 // Local Variables:
