@@ -2,7 +2,7 @@
   "Given a NUMBER, divide by 3, round down, and subtract 2."
   (- (floor (/ number 3)) 2))
 
-(defun calculate-fuel-with-fuel (parsed-number)
+(defun calculate-fuel-with-fuel-loop (parsed-number)
   "Given a NUMBER, calculate the fuel requirement while considering the previous fuel requirement."
   (loop
     with next-value = (calculate-fuel (calculate-fuel parsed-number))
@@ -11,10 +11,20 @@
     do (setq next-value (calculate-fuel next-value))
     finally (return (+ (calculate-fuel parsed-number) intermediate-value))))
 
+(defun calculate-fuel-with-fuel-recursive (previous-result next-value)
+  "Given a NUMBER, calculate the fuel requirement while considering the previous fuel requirement."
+  (if (or (zerop next-value) (minusp next-value))
+    previous-result
+    (calculate-fuel-with-fuel-recursive
+      (+ previous-result next-value)
+      (calculate-fuel next-value))))
+  
 (defun main (&optional (list-of-numbers (map 'list 'parse-integer (uiop:read-file-lines "input.txt"))))
   (loop
     for parsed-number in list-of-numbers
-    sum (calculate-fuel-with-fuel parsed-number)))
+    sum (calculate-fuel-with-fuel-recursive
+          (calculate-fuel parsed-number)
+          (calculate-fuel (calculate-fuel parsed-number)))))
 
 (defun run-tests ()
   "Run a suite of test cases."
