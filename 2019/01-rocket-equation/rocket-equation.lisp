@@ -21,5 +21,3 @@
   (assert (= (main '(14)) 2))
   (assert (= (main '(1969)) 966))
   (assert (= (main '(100756)) 50346)))
-
-
