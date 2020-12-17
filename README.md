@@ -2,8 +2,8 @@
 
 My Advent of Code solutions using one of the following languages:
 
-- D
+- Raku
 - Haxe
 - JavaScript
 - Emacs Lisp
-- Common Lisp
+- Rust
